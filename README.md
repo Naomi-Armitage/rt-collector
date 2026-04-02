@@ -5,9 +5,10 @@ A small Python utility for extracting `rt_*` tokens from a single file or every 
 ## Project Layout
 
 ```text
-rt_collector/
-  rt.py
+rt.py
 ```
+
+This repository lives in its own workspace folder so it does not conflict with other scripts under `sh/`.
 
 ## Features
 
@@ -19,15 +20,15 @@ rt_collector/
 ## Usage
 
 ```bash
-python3 rt_collector/rt.py <input_file_or_dir> [output_file]
+python3 rt.py <input_file_or_dir> [output_file]
 ```
 
 Examples:
 
 ```bash
-python3 rt_collector/rt.py data
-python3 rt_collector/rt.py data result.txt
-python3 rt_collector/rt.py input.txt output.txt
+python3 rt.py data
+python3 rt.py data result.txt
+python3 rt.py input.txt output.txt
 ```
 
 ## License
