@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+
+.venv/
+.uv-cache/
+.pytest_cache/
+
+output.txt
+
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

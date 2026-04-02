@@ -2,6 +2,13 @@
 
 A small Python utility for extracting `rt_*` tokens from a single file or every file in a directory.
 
+## Project Layout
+
+```text
+rt_collector/
+  rt.py
+```
+
 ## Features
 
 - Extracts all `rt_*` values from text content
@@ -12,15 +19,15 @@ A small Python utility for extracting `rt_*` tokens from a single file or every 
 ## Usage
 
 ```bash
-python3 rt.py <input_file_or_dir> [output_file]
+python3 rt_collector/rt.py <input_file_or_dir> [output_file]
 ```
 
 Examples:
 
 ```bash
-python3 rt.py data
-python3 rt.py data result.txt
-python3 rt.py input.txt output.txt
+python3 rt_collector/rt.py data
+python3 rt_collector/rt.py data result.txt
+python3 rt_collector/rt.py input.txt output.txt
 ```
 
 ## License
