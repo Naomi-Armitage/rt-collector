@@ -1,15 +1,70 @@
 #!/usr/bin/env python3
 import re
+import string
 import sys
+from collections import Counter
 from pathlib import Path
 
-PATTERN = re.compile(r"rt_[A-Za-z0-9._-]+")
+RT_START_PATTERN = re.compile(r"rt_")
+# Any punctuation run with length >= 3 is treated as a potential field separator.
+SEPARATOR_RUN_PATTERN = re.compile(r"[^A-Za-z0-9\s]{3,}")
+RT_ALLOWED_CHARS = set(string.ascii_letters + string.digits + "._-")
 DEFAULT_OUTPUT_FILE = "output.txt"
 
 
+def detect_repeated_separators(line: str) -> set[str]:
+    # Detect the actual separator format used on this line instead of hardcoding
+    # specific strings like `----` or `___`.
+    counts = Counter(match.group(0) for match in SEPARATOR_RUN_PATTERN.finditer(line))
+    return {separator for separator, count in counts.items() if count >= 2}
+
+
+def normalize_repeated_separators(line: str) -> str:
+    # Normalize the repeated separator formats that this line actually uses.
+    normalized_line = line
+    for separator in sorted(detect_repeated_separators(line), key=len, reverse=True):
+        normalized_line = normalized_line.replace(separator, " ")
+    return normalized_line
+
+
+def extract_rts_from_line(line: str) -> list[str]:
+    normalized_line = normalize_repeated_separators(line)
+    separator_runs = {
+        match.start(): match.group(0)
+        for match in SEPARATOR_RUN_PATTERN.finditer(normalized_line)
+    }
+    results = []
+
+    for match in RT_START_PATTERN.finditer(normalized_line):
+        start = match.start()
+        end = start
+
+        while end < len(normalized_line):
+            separator = separator_runs.get(end)
+            if separator and end > start:
+                # Even if a long separator only appears once on the line, it is
+                # still very likely to be a field boundary rather than rt data.
+                break
+
+            if normalized_line[end] in RT_ALLOWED_CHARS:
+                end += 1
+                continue
+            break
+
+        token = normalized_line[start:end]
+        if token != "rt_":
+            results.append(token)
+
+    return results
+
+
 def extract_rts(text: str) -> list[str]:
-    # Extract every rt_* token from the given text.
-    return PATTERN.findall(text)
+    # Extract rt tokens line by line so per-line separator formats can be
+    # detected dynamically.
+    results = []
+    for line in text.splitlines():
+        results.extend(extract_rts_from_line(line))
+    return results
 
 
 def iter_input_files(input_path: Path, output_path: Path) -> list[Path]:
